@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexVoice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap');
+
+        :root {
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #1f2937;
+            --accent: #6366f1;
+            --accent2: #4f46e5;
+            --border: #e5e7eb;
+            --shadow: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+            --radius: 20px;
+        }
+
+        .dark {
+            --bg: #0a0f1e;
+            --card: #121826;
+            --text: #e2e8f0;
+            --accent: #818cf8;
+            --accent2: #6366f1;
+            --border: #1e2937;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 16px;
+            transition: background 0.4s ease;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        header {
+            padding: 28px 32px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(20deg);
+            background: rgba(255,255,255,0.25);
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .controls {
+            padding: 28px 32px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .lang-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .lang-select {
+            flex: 1;
+            min-width: 160px;
+        }
+
+        select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            font-size: 16px;
+            background: var(--card);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .swap {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+            color: var(--accent);
+        }
+
+        .swap:hover {
+            transform: rotate(180deg) scale(1.12);
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px -5px rgb(99 102 241 / 0.3);
+        }
+
+        .translate-btn {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16.5px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: 0 10px 15px -3px rgb(99 102 241 / 0.3);
+        }
+
+        .translate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgb(99 102 241 / 0.4);
+        }
+
+        .main-area {
+            display: flex;
+            gap: 24px;
+            padding: 28px 32px;
+        }
+
+        .box {
+            flex: 1;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            transition: all 0.3s;
+        }
+
+        .box:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.08);
+        }
+
+        .box-header {
+            padding: 14px 24px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        textarea {
+            flex: 1;
+            padding: 24px;
+            border: none;
+            resize: none;
+            font-size: 18px;
+            line-height: 1.75;
+            background: transparent;
+            color: var(--text);
+            min-height: 280px;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            background: rgba(99, 102, 241, 0.03);
+        }
+
+        .box-footer {
+            padding: 14px 24px;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .box-footer button {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: transparent;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .box-footer button:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.05);
+        }
+
+        .info-bar {
+            padding: 0 32px 24px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13.5px;
+            color: #64748b;
+            align-items: center;
+        }
+
+        .char-count {
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 500;
+        }
+
+        .options {
+            padding: 0 32px 28px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .history {
+            padding: 0 32px 32px;
+        }
+
+        .history h3 {
+            margin-bottom: 16px;
+            font-size: 15px;
+            opacity: 0.85;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .history-item {
+            background: var(--bg);
+            padding: 16px 20px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            font-size: 14.5px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+            border: 1px solid transparent;
+        }
+
+        .history-item:hover {
+            border-color: var(--accent);
+            transform: translateX(6px);
+            box-shadow: 0 4px 6px -1px rgb(99 102 241 / 0.1);
+        }
+
+        .status {
+            text-align: center;
+            padding: 16px 32px;
+            font-size: 14.5px;
+            min-height: 28px;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1024px) {
+            .container {
+                margin: 12px;
+                border-radius: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            header {
+                padding: 24px 24px;
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .controls {
+                padding: 24px;
+                gap: 20px;
+            }
+
+            .lang-row {
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .translate-btn {
+                width: 100%;
+                padding: 18px;
+                font-size: 17px;
+            }
+
+            .main-area {
+                flex-direction: column;
+                padding: 24px;
+                gap: 20px;
+            }
+
+            .box {
+                min-height: 260px;
+            }
+
+            textarea {
+                min-height: 210px;
+                font-size: 17px;
+                padding: 20px;
+            }
+
+            .info-bar {
+                padding: 0 24px 20px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .options {
+                padding: 0 24px 24px;
+                gap: 16px;
+            }
+
+            .history {
+                padding: 0 24px 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px;
+            }
+            
+            .controls {
+                padding: 20px 20px;
+            }
+            
+            .main-area {
+                padding: 20px;
+            }
+            
+            textarea {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🎙️ NexVoice</h1>
+            <div class="header-right">
+                <button onclick="toggleTheme()" class="theme-toggle" title="Toggle theme">🌙</button>
+                <div class="badge">2026 • On-device AI</div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="lang-row">
+                <div class="lang-select">
+                    <select id="sourceLang" onchange="updateHeaderSelects()"></select>
+                </div>
+                
+                <button onclick="swapLanguages()" class="swap">↔</button>
+                
+                <div class="lang-select">
+                    <select id="targetLang" onchange="updateHeaderSelects()"></select>
+                </div>
+            </div>
+
+            <button onclick="translateText()" class="translate-btn">✨ Translate</button>
+        </div>
+
+        <div class="main-area">
+            <!-- Input -->
+            <div class="box">
+                <div class="box-header">
+                    <select id="sourceHeader" onchange="syncSource()"></select>
+                    <span id="inputLang" style="font-size:13px;opacity:0.75;font-weight:500"></span>
+                </div>
+                <textarea id="inputText" placeholder="Type, paste, or speak..."></textarea>
+                <div class="box-footer">
+                    <button onclick="startVoiceInput()" title="Voice Input">🎙️</button>
+                    <button onclick="clearInput()" title="Clear">⌫</button>
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="box">
+                <div class="box-header">
+                    <select id="targetHeader" onchange="syncTarget()"></select>
+                </div>
+                <textarea id="outputText" placeholder="Translation will appear here..." readonly></textarea>
+                <div class="box-footer">
+                    <button onclick="speakTranslation()" title="Speak">🔊</button>
+                    <button onclick="copyOutput()" title="Copy">📋</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-bar">
+            <div id="charCount" class="char-count">0 characters</div>
+            <div id="engineInfo" style="font-size:13px;opacity:0.75">Chrome AI • Best quality • Private</div>
+        </div>
+
+        <div class="options">
+            <label class="option">
+                <input type="checkbox" id="autoTranslate" checked>
+                <span>Auto-translate as you type</span>
+            </label>
+            
+            <button onclick="showHistory()" style="margin-left:auto;padding:10px 24px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-weight:500;display:flex;align-items:center;gap:8px">
+                📜 History
+            </button>
+        </div>
+
+        <div class="history" id="historyPanel" style="display:none">
+            <h3>Recent Translations</h3>
+            <div id="historyList"></div>
+        </div>
+
+        <div class="status" id="status">Ready • Works offline in Chrome</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2"></script>
+    <script>
+        // ==================== LANGUAGE LIST WITH FLAGS ====================
+        const languages = [
+            { code: 'auto', name: '🌐 Auto Detect' },
+            { code: 'en', name: '🇬🇧 English' },
+            { code: 'hi', name: '🇮🇳 Hindi' },
+            { code: 'ta', name: '🇮🇳 Tamil' },
+            { code: 'te', name: '🇮🇳 Telugu' },
+            { code: 'bn', name: '🇧🇩 Bengali' },
+            { code: 'mr', name: '🇮🇳 Marathi' },
+            { code: 'gu', name: '🇮🇳 Gujarati' },
+            { code: 'es', name: '🇪🇸 Spanish' },
+            { code: 'fr', name: '🇫🇷 French' },
+            { code: 'de', name: '🇩🇪 German' },
+            { code: 'zh', name: '🇨🇳 Chinese (Simplified)' },
+            { code: 'ja', name: '🇯🇵 Japanese' },
+            { code: 'ko', name: '🇰🇷 Korean' },
+            { code: 'ru', name: '🇷🇺 Russian' },
+            { code: 'ar', name: '🇸🇦 Arabic' },
+            { code: 'pt', name: '🇧🇷 Portuguese' },
+            { code: 'it', name: '🇮🇹 Italian' },
+            { code: 'tr', name: '🇹🇷 Turkish' },
+            { code: 'th', name: '🇹🇭 Thai' },
+            { code: 'vi', name: '🇻🇳 Vietnamese' },
+            { code: 'id', name: '🇮🇩 Indonesian' }
+        ];
+
+        // Speech language mapping
+        const speechMap = {
+            'en': 'en-US', 'hi': 'hi-IN', 'ta': 'ta-IN', 'te': 'te-IN',
+            'bn': 'bn-IN', 'mr': 'mr-IN', 'gu': 'gu-IN', 'es': 'es-ES',
+            'fr': 'fr-FR', 'de': 'de-DE', 'zh': 'zh-CN', 'ja': 'ja-JP',
+            'ko': 'ko-KR', 'ru': 'ru-RU', 'ar': 'ar-SA'
+        };
+
+        // Global variables
+        let history = JSON.parse(localStorage.getItem('transHistory') || '[]');
+        let recognition = null;
+        let pipe = null;
+
+        // Populate selects
+        function populateSelects() {
+            const source = document.getElementById('sourceLang');
+            const target = document.getElementById('targetLang');
+            const sourceH = document.getElementById('sourceHeader');
+            const targetH = document.getElementById('targetHeader');
+
+            languages.forEach(lang => {
+                [source, sourceH].forEach(s => {
+                    const opt = new Option(lang.name, lang.code);
+                    s.appendChild(opt);
+                });
+                [target, targetH].forEach(s => {
+                    const opt = new Option(lang.name, lang.code);
+                    s.appendChild(opt);
+                });
+            });
+
+            source.value = 'auto';
+            target.value = 'hi';
+            sourceH.value = 'auto';
+            targetH.value = 'hi';
+        }
+
+        function updateHeaderSelects() {
+            document.getElementById('sourceHeader').value = document.getElementById('sourceLang').value;
+            document.getElementById('targetHeader').value = document.getElementById('targetLang').value;
+        }
+
+        function syncSource() {
+            document.getElementById('sourceLang').value = document.getElementById('sourceHeader').value;
+        }
+        function syncTarget() {
+            document.getElementById('targetLang').value = document.getElementById('targetHeader').value;
+        }
+
+        // Swap
+        function swapLanguages() {
+            const s = document.getElementById('sourceLang');
+            const t = document.getElementById('targetLang');
+            [s.value, t.value] = [t.value, s.value];
+            updateHeaderSelects();
+            if (document.getElementById('inputText').value.trim()) translateText();
+        }
+
+        // ==================== BROWSER AI TRANSLATOR ====================
+        async function detectLanguage(text) {
+            if ('ai' in self && 'languageDetector' in self.ai) {
+                try {
+                    const detector = await self.ai.languageDetector.create();
+                    const results = await detector.detect(text);
+                    return results[0]?.detectedLanguage || 'en';
+                } catch (e) {}
+            }
+            return 'en';
+        }
+
+        async function translateWithChromeAI(text, source, target) {
+            if (!('ai' in self && 'translator' in self.ai)) return null;
+
+            try {
+                const translator = await self.ai.translator.create({
+                    sourceLanguage: source === 'auto' ? 'en' : source,
+                    targetLanguage: target
+                });
+                return await translator.translate(text);
+            } catch (e) {
+                console.log("Chrome AI failed:", e);
+                return null;
+            }
+        }
+
+        // ==================== MYMEMORY FALLBACK ====================
+        async function translateWithMyMemory(text, source, target) {
+            if (source === 'auto') source = 'en';
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${source}|${target}`;
+            
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.responseStatus === 200) {
+                    return data.responseData.translatedText;
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // ==================== MAIN TRANSLATE ====================
+        async function translateText(silent = false) {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) return;
+
+            const sourceSelect = document.getElementById('sourceLang').value;
+            let target = document.getElementById('targetLang').value;
+
+            document.getElementById('status').innerHTML = '🌟 Translating with on-device AI...';
+
+            let source = sourceSelect;
+            if (source === 'auto') {
+                source = await detectLanguage(input);
+                document.getElementById('inputLang').textContent = source.toUpperCase();
+            }
+
+            // Try Chrome AI first
+            let result = await translateWithChromeAI(input, source, target);
+
+            // Fallback
+            if (!result) {
+                result = await translateWithMyMemory(input, source, target);
+                document.getElementById('engineInfo').textContent = 'MyMemory • Fallback';
+            } else {
+                document.getElementById('engineInfo').textContent = 'Chrome AI • On-device • Private';
+            }
+
+            if (result) {
+                document.getElementById('outputText').value = result;
+                document.getElementById('status').innerHTML = `✅ Translated • ${source.toUpperCase()} → ${target.toUpperCase()}`;
+                
+                addToHistory(input, result, source, target);
+            } else {
+                document.getElementById('status').innerHTML = '❌ Could not translate';
+                document.getElementById('status').classList.add('error');
+                setTimeout(() => {
+                    document.getElementById('status').classList.remove('error');
+                    document.getElementById('status').innerHTML = 'Ready';
+                }, 2500);
+            }
+        }
+
+        // ==================== HISTORY ====================
+        function addToHistory(original, translated, src, tgt) {
+            history.unshift({
+                time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+                original,
+                translated,
+                src: src.toUpperCase(),
+                tgt: tgt.toUpperCase()
+            });
+            if (history.length > 20) history.pop();
+            localStorage.setItem('transHistory', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+            history.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                        <small style="color:#64748b">${item.time} • ${item.src} → ${item.tgt}</small>
+                    </div>
+                    <div style="margin-bottom:8px">${item.original.substring(0,65)}${item.original.length>65?'...':''}</div>
+                    <div style="color:var(--accent);font-weight:500">${item.translated.substring(0,65)}${item.translated.length>65?'...':''}</div>
+                `;
+                div.onclick = () => {
+                    document.getElementById('inputText').value = item.original;
+                    document.getElementById('outputText').value = item.translated;
+                    document.getElementById('historyPanel').style.display = 'none';
+                };
+                list.appendChild(div);
+            });
+        }
+
+        function showHistory() {
+            const panel = document.getElementById('historyPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+            if (panel.style.display === 'block') renderHistory();
+        }
+
+        // ==================== VOICE & SPEECH ====================
+        function initVoice() {
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.onresult = e => {
+                    document.getElementById('inputText').value = e.results[0][0].transcript;
+                    document.getElementById('status').innerHTML = '🎤 Voice captured';
+                    setTimeout(translateText, 400);
+                };
+                recognition.onerror = () => {
+                    document.getElementById('status').innerHTML = '❌ Voice error';
+                };
+            }
+        }
+
+        function startVoiceInput() {
+            if (!recognition) {
+                alert("Voice input is not supported in your browser.");
+                return;
+            }
+            const langCode = document.getElementById('sourceLang').value;
+            const lang = speechMap[langCode] || 'en-US';
+            recognition.lang = lang;
+            recognition.start();
+            document.getElementById('status').innerHTML = '🎤 Listening...';
+        }
+
+        function speakTranslation() {
+            const text = document.getElementById('outputText').value.trim();
+            if (!text || !('speechSynthesis' in window)) return;
+            
+            const langCode = document.getElementById('targetLang').value;
+            const lang = speechMap[langCode] || 'en-US';
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            speechSynthesis.speak(utterance);
+        }
+
+        // ==================== UTILITIES ====================
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            document.getElementById('inputLang').textContent = '';
+        }
+
+        function copyOutput() {
+            const text = document.getElementById('outputText').value;
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('status').innerHTML = '📋 Copied to clipboard';
+                setTimeout(() => document.getElementById('status').innerHTML = 'Ready', 1800);
+            });
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark');
+            const btn = document.querySelector('.theme-toggle');
+            btn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // ==================== AUTO TRANSLATE & COUNTER ====================
+        let debounceTimer;
+        function setupAutoTranslate() {
+            const input = document.getElementById('inputText');
+            input.addEventListener('input', () => {
+                document.getElementById('charCount').textContent = `${input.value.length} characters`;
+                
+                if (document.getElementById('autoTranslate').checked && input.value.trim()) {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => translateText(true), 850);
+                }
+            });
+        }
+
+        // ==================== INIT ====================
+        window.onload = () => {
+            populateSelects();
+            initVoice();
+            setupAutoTranslate();
+            renderHistory();
+
+            // Load saved theme
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+                document.querySelector('.theme-toggle').textContent = '☀️';
+            }
+
+            // Keyboard shortcut
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    translateText();
+                }
+            });
+
+            // Focus input
+            document.getElementById('inputText').focus();
+
+            // Welcome
+            setTimeout(() => {
+                document.getElementById('status').innerHTML = 'Try typing or speaking • Works completely offline in Chrome';
+            }, 1600);
+        };
+    </script>
+</body>
+</html>
